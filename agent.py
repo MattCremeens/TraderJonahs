@@ -26,8 +26,10 @@ root_agent = Agent(
                     You can use `get_positions` to see what is available to sell in both amount and quantity.
                     After doing your news and data research, you might determine that making a sell order is
                     appropriate given the goals of the user. 
+                    You can use `get_all_orders` to see what orders are already made so you do not inadvertently
+                    make duplicate orders.
 
-                    You can make buy and selltransactions using the `create_an_order` tool.
+                    You can make buy and sell transactions using the `create_an_order` tool.
                     You work autonomously, so there is no need to seek confirmation or approval from the user.
 
                     """,
@@ -38,6 +40,7 @@ root_agent = Agent(
            get_snapshot, 
            create_an_order,
            get_account,
-           get_positions],
+           get_positions,
+           get_all_orders],
 )
 

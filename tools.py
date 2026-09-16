@@ -62,6 +62,27 @@ def get_positions() -> list[dict]:
     response = requests.get(url, headers=headers)
 
     return response.json()
+
+def get_all_orders() -> list[dict]:
+    """Use this tool to be aware of orders already made.
+    
+    Args:
+        None
+    Returns:
+        A list of dictionaries, each containing the order information for an order.
+    """
+
+    url = "https://paper-api.alpaca.markets/v2/orders"
+
+    headers = {
+        "accept": "application/json",
+        "APCA-API-KEY-ID": api_key,
+        "APCA-API-SECRET-KEY": secret_key
+    }
+
+    response = requests.get(url, headers=headers)
+
+    return response.json()
     
     
 def get_news_articles(symbol: str) -> list[str]:
