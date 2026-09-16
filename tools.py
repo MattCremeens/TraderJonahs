@@ -41,6 +41,28 @@ def get_account() -> dict:
     response = requests.get(url, headers=headers)
 
     return response.json()
+
+def get_positions() -> list[dict]:
+    """Use this tool to determine what is available to sell in both amount and quantity.
+    
+    Args:
+        None
+    Returns:
+        A list of dictionaries, each containing the position information for a stock.
+    """
+
+    url = "https://paper-api.alpaca.markets/v2/positions"
+
+    headers = {
+        "accept": "application/json",
+        "APCA-API-KEY-ID": api_key,
+        "APCA-API-SECRET-KEY": secret_key
+    }
+
+    response = requests.get(url, headers=headers)
+
+    return response.json()
+    
     
 def get_news_articles(symbol: str) -> list[str]:
     """

@@ -23,6 +23,13 @@ root_agent = Agent(
                     you do not overspend. It is okay to not spend every available penny. You may want
                     to leave some for another day.
 
+                    You can use `get_positions` to see what is available to sell in both amount and quantity.
+                    After doing your news and data research, you might determine that making a sell order is
+                    appropriate given the goals of the user. 
+
+                    You can make buy and selltransactions using the `create_an_order` tool.
+                    You work autonomously, so there is no need to seek confirmation or approval from the user.
+
                     """,
     tools=[get_sp500_symbols, 
            get_news_articles, 
@@ -30,6 +37,7 @@ root_agent = Agent(
            get_historical_bars, 
            get_snapshot, 
            create_an_order,
-           get_account],
+           get_account,
+           get_positions],
 )
 
