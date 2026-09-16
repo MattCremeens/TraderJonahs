@@ -1,7 +1,19 @@
+import os
+
+from dotenv import load_dotenv
+
+load_dotenv()
+os.environ.setdefault("LANGSMITH_TRACING", "true")
+os.environ.setdefault("LANGSMITH_PROJECT", "TraderJonahs")
+
 from google.adk.agents.llm_agent import Agent
 from google.adk.models.lite_llm import LiteLlm
+from langsmith.integrations.google_adk import configure_google_adk
+
 from tools import *
 
+# Instrument ADK (runner, LLM calls, and tools) so traces go to LangSmith.
+configure_google_adk()
 
 root_agent = Agent(
     model="gemini-flash-latest",

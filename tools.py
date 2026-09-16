@@ -1,10 +1,11 @@
 import os
-import requests
-from tavily import TavilyClient
-from dotenv import load_dotenv
-import pandas as pd
 from io import StringIO
 
+import pandas as pd
+import requests
+from dotenv import load_dotenv
+from langsmith import traceable
+from tavily import TavilyClient
 
 load_dotenv()
 
@@ -16,6 +17,7 @@ tavily_client = TavilyClient(api_key=tavily_key)
 
 # Alpaca
 
+@traceable(run_type="tool")
 def get_account() -> dict:
     """
     Use this tool to get account information. This should tell you how much money
@@ -42,6 +44,7 @@ def get_account() -> dict:
 
     return response.json()
 
+@traceable(run_type="tool")
 def get_positions() -> list[dict]:
     """Use this tool to determine what is available to sell in both amount and quantity.
     
@@ -63,6 +66,7 @@ def get_positions() -> list[dict]:
 
     return response.json()
 
+@traceable(run_type="tool")
 def get_all_orders() -> list[dict]:
     """Use this tool to be aware of orders already made.
     
@@ -85,6 +89,7 @@ def get_all_orders() -> list[dict]:
     return response.json()
     
     
+@traceable(run_type="tool")
 def get_news_articles(symbol: str) -> list[str]:
     """
     Use this tool in order to learn what news articles on a specific company are available.
@@ -110,6 +115,7 @@ def get_news_articles(symbol: str) -> list[str]:
 
     return article_urls
 
+@traceable(run_type="tool")
 def get_historical_bars(symbol: str, timeframe: str) -> dict:
     """
     Use this tool to get the historical bars for a specific company.
@@ -145,6 +151,7 @@ def get_historical_bars(symbol: str, timeframe: str) -> dict:
 
     return response.json()
 
+@traceable(run_type="tool")
 def get_snapshot(symbol: str) -> dict:
     """
     Use this tool to get the snapshot for a specific company.
@@ -169,6 +176,7 @@ def get_snapshot(symbol: str) -> dict:
 
     return response.json()
 
+@traceable(run_type="tool")
 def create_an_order(symbol: str, side: str, qty: int) -> dict:
     """
     Use this tool to make an order to buy or sell a stock with a given symbol.
@@ -201,6 +209,7 @@ def create_an_order(symbol: str, side: str, qty: int) -> dict:
     return response.text
 
 # Tavily
+@traceable(run_type="tool")
 def get_news_article(url: str) -> str:
     """
     Use this tool when you want to research a company in order to help you 
@@ -216,6 +225,7 @@ def get_news_article(url: str) -> str:
     return response['results'][0]['raw_content']
 
 # All symbols
+@traceable(run_type="tool")
 def get_sp500_symbols() -> list[str]:
     """
     Use this tool to get a list of all of the symbols that make up the S&P 500.
