@@ -116,7 +116,7 @@ def get_news_articles(symbol: str) -> list[str]:
     return article_urls
 
 @traceable(run_type="tool")
-def get_historical_bars(symbol: str, timeframe: str) -> dict:
+def get_historical_bars(symbol: str, timeframe: str, start: str, end: str, limit: str) -> dict:
     """
     Use this tool to get the historical bars for a specific company.
     It is useful when you want to gather evidence to help you determine whether 
@@ -135,11 +135,13 @@ def get_historical_bars(symbol: str, timeframe: str) -> dict:
     Args:
         symbol: The symbol of the company to research.
         timeframe: The timeframe of the bars to get.
-
+        start: The start date of the bars to get.
+        end: The end date of the bars to get. Day must be less than today's date.
+        limit: The limit of the bars to get.
     Returns:
         A dictionary of the historical bars for the company.
     """
-    url = f"https://data.alpaca.markets/v2/stocks/{symbol}/bars?timeframe={timeframe}&limit=1000&adjustment=raw&feed=sip&sort=asc"
+    url = f"https://data.alpaca.markets/v2/stocks/{symbol}/bars?timeframe={timeframe}&start={start}&end={end}&limit={limit}&adjustment=raw&feed=sip&sort=asc"
 
     headers = {
         "accept": "application/json",

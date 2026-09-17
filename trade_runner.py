@@ -28,9 +28,9 @@ async def main():
     )
 
     user_query = """
-    Take a look at my portfolio as well as some stocks not currently in my
-    portfolio and analyze them by looking at their historical data as well
-    as relevant news articles.
+    Take a look at my portfolio as well as a modest sample of stocks 
+    not currently in my portfolio and analyze them by looking at their 
+    historical data as well as relevant news articles.
 
     With this analysis, assess whether to buy, sell, or hold the stocks you
     are examining.
