@@ -115,33 +115,24 @@ def get_news_articles(symbol: str) -> list[str]:
 
     return article_urls
 
-@traceable(run_type="tool")
-def get_historical_bars(symbol: str, timeframe: str, start: str, end: str, limit: str) -> dict:
-    """
-    Use this tool to get the historical bars for a specific company.
-    It is useful when you want to gather evidence to help you determine whether 
-    to buy or sell a stock and how much to buy or sell.
+def _get_historical_bars(
+    symbol: str,
+    timeframe: str,
+    start: str,
+    end: str,
+    limit: int
+) -> dict:
 
-    For timeframe, The timeframe represented by each bar in aggregation.
-    You can use any of the following values:
-
-    [1-59]Min or [1-59]T, e.g. 5Min or 5T creates 5-minute aggregations
-    [1-23]Hour or [1-23]H, e.g. 12Hour or 12H creates 12-hour aggregations
-    1Day or 1D creates 1-day aggregations
-    1Week or 1W creates 1-week aggregations
-    [1,2,3,4,6,12]Month or [1,2,3,4,6,12]M, e.g. 3Month or 3M creates 3-month aggregations
-
-
-    Args:
-        symbol: The symbol of the company to research.
-        timeframe: The timeframe of the bars to get.
-        start: The start date of the bars to get.
-        end: The end date of the bars to get. Day must be less than today's date.
-        limit: The limit of the bars to get.
-    Returns:
-        A dictionary of the historical bars for the company.
-    """
-    url = f"https://data.alpaca.markets/v2/stocks/{symbol}/bars?timeframe={timeframe}&start={start}&end={end}&limit={limit}&adjustment=raw&feed=sip&sort=asc"
+    url = (
+        f"https://data.alpaca.markets/v2/stocks/{symbol}/bars"
+        f"?timeframe={timeframe}"
+        f"&start={start}"
+        f"&end={end}"
+        f"&limit={limit}"
+        f"&adjustment=raw"
+        f"&feed=sip"
+        f"&sort=asc"
+    )
 
     headers = {
         "accept": "application/json",
@@ -150,8 +141,82 @@ def get_historical_bars(symbol: str, timeframe: str, start: str, end: str, limit
     }
 
     response = requests.get(url, headers=headers)
+    response.raise_for_status()
 
     return response.json()
+
+@traceable(run_type="tool")
+def get_candlestick_signals(
+    symbol: str,
+    timeframe: str,
+    start: str,
+    end: str,
+    limit: int
+) -> list[dict]:
+    """
+    Analyze historical candlestick data for a stock and identify
+    bullish, bearish, or neutral candlestick patterns.
+
+    Args:
+        symbol: Stock ticker symbol.
+        timeframe: Alpaca bar timeframe, such as 1Day, 1Hour, or 5Min.
+        start: Start date/time for historical bars.
+        end: End date/time for historical bars.
+        limit: Maximum number of bars to retrieve.
+
+    Returns:
+        A list of candlestick signals containing the date and signal.
+    """
+
+    historical_bars = _get_historical_bars(
+        symbol=symbol,
+        timeframe=timeframe,
+        start=start,
+        end=end,
+        limit=limit
+    )
+
+    df = pd.DataFrame(historical_bars["bars"])
+
+    df["t"] = pd.to_datetime(df["t"])
+    df.set_index("t", inplace=True)
+
+    df = df.rename(columns={
+        "c": "Close",
+        "o": "Open",
+        "h": "High",
+        "l": "Low",
+        "v": "Volume"
+    })
+
+    signals = []
+
+    for i in range(len(df)):
+        signal = "NEUTRAL"
+
+        if i >= 2:
+            # Three consecutive green candles (buy)
+            if (
+                df.iloc[i - 2]["Close"] > df.iloc[i - 2]["Open"]
+                and df.iloc[i - 1]["Close"] > df.iloc[i - 1]["Open"]
+                and df.iloc[i]["Close"] > df.iloc[i]["Open"]
+            ):
+                signal = "BEARISH"
+
+            # Three consecutive red candles (sell)
+            elif (
+                df.iloc[i - 2]["Close"] < df.iloc[i - 2]["Open"]
+                and df.iloc[i - 1]["Close"] < df.iloc[i - 1]["Open"]
+                and df.iloc[i]["Close"] < df.iloc[i]["Open"]
+            ):
+                signal = "BULLISH"
+
+        signals.append({
+            "Date": df.index[i].isoformat(),
+            "Signal": signal
+        })
+
+    return signals
 
 @traceable(run_type="tool")
 def get_snapshot(symbol: str) -> dict:
@@ -179,7 +244,7 @@ def get_snapshot(symbol: str) -> dict:
     return response.json()
 
 @traceable(run_type="tool")
-def create_an_order(symbol: str, side: str, qty: int) -> dict:
+def create_an_order(symbol: str, side: str, qty: float) -> dict:
     """
     Use this tool to make an order to buy or sell a stock with a given symbol.
     side may be "buy" or "sell" only. qty is the number of shares to buy or sell.

@@ -26,8 +26,9 @@ root_agent = Agent(
                     in the S&P 500.
 
                     You recommend buying or selling stocks based on what you learn from
-                    reading the news about that company. You also can use `get_historical_bars` and `get_snapshot` 
+                    reading the news about that company. You also can use `get_candlestick_signals` 
                     to get a feel from the data with regards to trends and patterns, which may be helpful.
+
                     You are conservative, but want the user to make money.
                     
                     You can use `get_account` to get information about the account, such as how much money
@@ -39,7 +40,8 @@ root_agent = Agent(
                     After doing your news and data research, you might determine that making a sell order is
                     appropriate given the goals of the user. 
                     You can use `get_all_orders` to see what orders are already made so you do not inadvertently
-                    make duplicate orders.
+                    make duplicate orders. You can use `get_snapshot` to get the current snapshot of the stock, 
+                    which can help you know the current price of the stock.
 
                     You can make buy and sell transactions using the `create_an_order` tool.
                     You work autonomously, so there is no need to seek confirmation or approval from the user.
@@ -48,7 +50,7 @@ root_agent = Agent(
     tools=[get_sp500_symbols, 
            get_news_articles, 
            get_news_article, 
-           get_historical_bars, 
+           get_candlestick_signals, 
            get_snapshot, 
            create_an_order,
            get_account,
