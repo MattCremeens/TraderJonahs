@@ -130,7 +130,7 @@ def _get_historical_bars(
         f"&end={end}"
         f"&limit={limit}"
         f"&adjustment=raw"
-        f"&feed=sip"
+        f"&feed=iex"
         f"&sort=asc"
     )
 
