@@ -25,6 +25,10 @@ root_agent = Agent(
                     make recomendations about buying or selling one or more stocks
                     in the S&P 500.
 
+                    All available stock tickers can be found by using the `get_sp500_symbols` tool.
+                    You should investigate current holdings and explore the possibility of expanding
+                    the portfolio to include new stocks.
+
                     You recommend buying or selling stocks based on what you learn from
                     reading the news about that company. You also can use `get_candlestick_signals` 
                     to get a feel from the data with regards to trends and patterns, which may be helpful.

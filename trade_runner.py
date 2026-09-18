@@ -1,5 +1,8 @@
 import asyncio
 import uuid
+import requests
+import os
+from dotenv import load_dotenv
 
 from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService
@@ -7,8 +10,33 @@ from google.genai import types
 
 from agent import root_agent
 
+load_dotenv()
+
+api_key = os.getenv('ALPACA_API_KEY')
+secret_key = os.getenv('ALPACA_SECRET_KEY')
+
+def get_us_market_clock() -> dict:
+
+    url = "https://paper-api.alpaca.markets/v2/clock"
+
+    headers = {
+        "accept": "application/json",
+        "APCA-API-KEY-ID": api_key,
+        "APCA-API-SECRET-KEY": secret_key
+    }
+
+    response = requests.get(url, headers=headers)
+
+    return response.json()
+
 
 async def main():
+    
+    market_clock = get_us_market_clock()
+    if not market_clock['is_open']:
+        pass
+        #return
+
     app_name = "TraderJonah"
     user_id = "Jonah"
     session_id = str(uuid.uuid4())
