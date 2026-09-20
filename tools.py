@@ -273,7 +273,7 @@ def create_an_order(symbol: str, side: str, qty: float) -> dict:
 
     response = requests.post(url, json=payload, headers=headers)
 
-    return response.text
+    return response.json()
 
 # Tavily
 @traceable(run_type="tool")
