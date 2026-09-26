@@ -145,6 +145,7 @@ def _get_historical_bars(
 
     return response.json()
 
+
 @traceable(run_type="tool")
 def get_candlestick_signals(
     symbol: str,
@@ -217,6 +218,91 @@ def get_candlestick_signals(
         })
 
     return signals
+
+@traceable(run_type="tool")
+def get_hammer_signals(
+    symbol: str,
+    timeframe: str,
+    start: str,
+    end: str,
+    limit: int
+) -> list[dict]:
+    """
+    Analyze historical candlestick data for hammer-shaped candles and
+    classify them as bullish, bearish, or neutral.
+
+    Args:
+        symbol: Stock ticker symbol.
+        timeframe: Alpaca bar timeframe, such as 1Day, 1Hour, or 5Min.
+        start: Start date/time for historical bars.
+        end: End date/time for historical bars.
+        limit: Maximum number of bars to retrieve.
+
+    Returns:
+        A list of hammer signals containing the date and signal.
+    """
+
+    historical_bars = _get_historical_bars(
+        symbol=symbol,
+        timeframe=timeframe,
+        start=start,
+        end=end,
+        limit=limit
+    )
+
+    df = pd.DataFrame(historical_bars["bars"])
+
+    df["t"] = pd.to_datetime(df["t"])
+    df.set_index("t", inplace=True)
+
+    df = df.rename(columns={
+        "c": "Close",
+        "o": "Open",
+        "h": "High",
+        "l": "Low",
+        "v": "Volume"
+    })
+
+    signals = []
+
+    for i in range(len(df)):
+        signal = "NEUTRAL"
+
+        candle = df.iloc[i]
+
+        candle_range = candle["High"] - candle["Low"]
+        body = abs(candle["Open"] - candle["Close"])
+
+        hammer = (
+            candle_range > 3 * body
+            and ((candle["Close"] - candle["Low"]) /
+                 (0.001 + candle_range)) > 0.6
+            and ((candle["Open"] - candle["Low"]) /
+                 (0.001 + candle_range)) > 0.6
+        )
+
+        if hammer and i >= 3:
+            if (
+                df.iloc[i - 3]["Close"] > df.iloc[i - 3]["Open"]
+                and df.iloc[i - 2]["Close"] > df.iloc[i - 2]["Open"]
+                and df.iloc[i - 1]["Close"] > df.iloc[i - 1]["Open"]
+            ):
+                signal = "BEARISH"
+
+            elif (
+                df.iloc[i - 3]["Close"] < df.iloc[i - 3]["Open"]
+                and df.iloc[i - 2]["Close"] < df.iloc[i - 2]["Open"]
+                and df.iloc[i - 1]["Close"] < df.iloc[i - 1]["Open"]
+            ):
+                signal = "BULLISH"
+
+        signals.append({
+            "Date": df.index[i].isoformat(),
+            "Signal": signal
+        })
+
+    return signals
+    
 
 @traceable(run_type="tool")
 def get_snapshot(symbol: str) -> dict:
