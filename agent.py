@@ -27,9 +27,19 @@ root_agent = Agent(
                 Investigate current holdings and also explore opportunities to expand the portfolio
                 with new stocks.
 
-                Use relevant news about a company as an important part of your analysis. You can
-                also use `get_candlestick_signals` and `get_hammer_signals` as supporting technical
-                evidence about recent price patterns.
+                Use relevant news about a company as an important part of your analysis. 
+                When reading news articles, some URLs may not be extractable.
+
+                If `get_news_article` returns success=False, do not stop the analysis and
+                do not repeatedly retry the same URL. Choose another relevant URL from
+                the `get_news_articles` results and try that article instead.
+
+                Continue until you have enough successfully retrieved articles to make
+                a reasonable assessment, or until no suitable URLs remain.
+                
+                
+                You can also use `get_candlestick_signals` and `get_hammer_signals` 
+                as supporting technical evidence about recent price patterns.
 
                 Use both candlestick tools when evaluating a stock. Compare their signals to
                 determine whether they agree or conflict. If both produce the same non-neutral

@@ -6,6 +6,7 @@ import requests
 from dotenv import load_dotenv
 from langsmith import traceable
 from tavily import TavilyClient
+from tavily.errors import ForbiddenError
 
 load_dotenv()
 
@@ -374,8 +375,15 @@ def get_news_article(url: str) -> str:
     Returns:
         The raw content of the news article.
     """
-    response = tavily_client.extract(url)
-    return response['results'][0]['raw_content']
+    try:
+        response = tavily_client.extract(url)
+        return response['results'][0]['raw_content']
+    except ForbiddenError as e:
+        return {
+            "url": url,
+            "success": False,
+            "reason": "Tavily was forbidden from extracting this page."
+        }
 
 # All symbols
 @traceable(run_type="tool")
