@@ -364,21 +364,25 @@ def create_an_order(symbol: str, side: str, qty: float) -> dict:
 
 # Tavily
 @traceable(run_type="tool")
-def get_news_article(url: str) -> str:
-    """
-    Use this tool when you want to research a company in order to help you 
-    make a decision about whether to buy or sell a stock.
-
-    Args:
-        url: The URL of the news article to research.
-
-    Returns:
-        The raw content of the news article.
-    """
+def get_news_article(url: str) -> dict:
     try:
         response = tavily_client.extract(url)
-        return response['results'][0]['raw_content']
-    except ForbiddenError as e:
+        results = response.get("results", [])
+
+        if not results:
+            return {
+                "url": url,
+                "success": False,
+                "reason": "Tavily returned no extractable content for this page."
+            }
+
+        return {
+            "url": url,
+            "success": True,
+            "content": results[0].get("raw_content", "")
+        }
+
+    except ForbiddenError:
         return {
             "url": url,
             "success": False,

@@ -16,7 +16,7 @@ from tools import *
 configure_google_adk()
 
 root_agent = Agent(
-    model="gemini-flash-latest",
+    model="gemini-3.6-flash",
     name='root_agent',
     description="""An expert and making a decision about buying or selling stocks.""",
     instruction="""
