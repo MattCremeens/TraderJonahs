@@ -5,6 +5,7 @@ gcloud run jobs execute traderjonahs \
   --wait
 
 To deploy to the cloud, run:
+
 gcloud run jobs deploy traderjonahs \
   --source . \
   --region us-central1 \
